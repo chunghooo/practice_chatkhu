@@ -60,7 +60,8 @@ def ocr(b):
 def analyze(rows, raw, src, url="", imgs=()):
     for r in rows:
         r.update(classify(r["text"]))
-        r.setdefault("ai", None), r.setdefault("gem", ""), r.setdefault("memo", "")
+        for k, v0 in (("ai", None), ("gem", ""), ("memo", "")):
+            r.setdefault(k, v0)
     m = get_model()
     if m is not None:
         out = apply_model(rows, m)
@@ -224,7 +225,10 @@ if "rows" in st.session_state:
     memo = {r["id"]: r.get("memo") or "" for r in S.rows}
     for i, r in ed.iterrows():
         cid = v.at[i, "id"]
-        (S.sel.add if r["포함"] else S.sel.discard)(cid)
+        if r["포함"]:
+            S.sel.add(cid)
+        else:
+            S.sel.discard(cid)
         memo[cid] = r["memo"] or ""
     for r in S.rows:
         r["memo"] = memo.get(r["id"], "")
